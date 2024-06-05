@@ -1,6 +1,11 @@
 <?php
-    function getPdls($conn, $archived){
-        $result = $conn->query("SELECT * FROM `pdls` WHERE `is-archived` = $archived");
+    function getPdls($conn, $br, $archived){
+        if ($br) {
+            $result = $conn->query("SELECT * FROM `pdls` WHERE `is-archived` = $archived AND `pdl-branch-location` = '$br'");
+        } else {
+            $result = $conn->query("SELECT * FROM `pdls` WHERE `is-archived` = $archived");
+        }
+        
         if ($result && $result->num_rows > 0) {
             $data = array();
             while ($row = $result->fetch_assoc()) {

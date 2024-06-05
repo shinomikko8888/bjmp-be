@@ -7,6 +7,7 @@
     function loginUser($conn, $data){
         $em = $data['user-email'];
         $ps = $data['user-password'];
+        $hashedPs = hashPassword($ps);
         if($em === '' || $ps === ''){
             $response = [
                 'success' => false,
@@ -35,12 +36,13 @@
                     return;
                 }
             }
-            $stmt = $conn->prepare("SELECT * FROM users WHERE `user-email` = ? AND `user-password` = ?");
-            $stmt->bind_param("ss", $em, $ps);
+            $stmt = $conn->prepare("SELECT * FROM users WHERE `user-email` = ? AND `is-archived` = 0");
+            $stmt->bind_param("s", $em);
             $stmt->execute();
             $result = $stmt->get_result();
             $user = $result->fetch_assoc();
-            if($user) {
+            
+            if($user && password_verify($ps, $user['user-password'])) {
                 $loginToken = bin2hex(random_bytes(32)); 
 
                 $storeToken = $conn->prepare("UPDATE users SET `user-login-token` = ? WHERE `user-email` = ?");
@@ -69,7 +71,8 @@
                     $response = [
                         'success' => false,
                         'message' => 'Invalid password. ' . $remainingAttempts . ' attempts remaining',
-                        'user' => null
+                        'user' => null,
+                        'verification' => password_verify($ps, $user['user-password'])
                     ];
                 } else {
                     /*$updateLockout = $conn->prepare("UPDATE users SET `user-attempt-count` = 1, `user-last-attempt-time` = NOW() WHERE `user-email` = ?");
@@ -496,7 +499,7 @@
             $userID = $data['id'];
             $primary = isset($data['prim']) ? $data['prim'] : '';
             
-            $result = $conn->query("DELETE FROM `users` WHERE `user-id` = $userID AND `pk` = $primary AND `is-archived` = 1");
+            $result = $conn->query("DELETE FROM `users` WHERE `user-id` = '$userID' AND `pk` = '$primary' AND `is-archived` = 1");
             createLog($conn, ['User', 'Delete', 'Single'], $data, $currentDateTime);
             if($result){
                 $response = [

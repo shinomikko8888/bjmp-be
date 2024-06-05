@@ -34,4 +34,56 @@
             }
         }
     }
+
+    if(!function_exists('createTransaction')){
+        function createTransaction($conn, $action, $data, $date, $filepath){
+            if($data){
+                if($action === 'Load'){
+                    $insertTransaction = $conn->prepare("INSERT INTO `transactions` (
+                        `transaction-id`,
+                        `transaction-created-at`,
+                        `transaction-user`,
+                        `transaction-type`,
+                        `transaction-branch-location`,
+                        `transaction-amount`,
+                        `transaction-pdl`,
+                        `transaction-lender`,
+                        `transaction-receipt`
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
+                    $insertTransaction->bind_param("issssdiss", $data[0], $date, $data[1], $action, $data[7], $data[4], $data[2], $data[5], $filepath);
+                    $insertTransaction->execute();
+                }
+                else if ($action === 'Purchase'){
+                    $items = [];
+                    foreach ($data[6] as $item) {
+                        $items[] = [
+                            'id' => $item['commodity-item-id'], 
+                            'type' => $item['commodity-type'], 
+                            'name' => $item['commodity-name'], 
+                            'quantity' => $item['commodity-quantity'], 
+                            'price' => $item['commodity-price'],
+                        ];
+                    }
+                    $itemsJson = json_encode($items);
+                    $insertTransaction = $conn->prepare("INSERT INTO `transactions` (
+                        `transaction-id`,
+                        `transaction-created-at`,
+                        `transaction-user`,
+                        `transaction-type`,
+                        `transaction-branch-location`,
+                        `transaction-amount`,
+                        `transaction-pdl`,
+                        `transaction-items`,
+                        `transaction-receipt`
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $insertTransaction->bind_param("issssdiss", $data[0], $date, $data[1], $action, $data[5], $data[7], $data[2], $itemsJson, $filepath);
+                    $insertTransaction->execute();
+
+                }
+            }
+            else{
+                echo 'Data not found';
+            }
+        }
+    }
 ?>

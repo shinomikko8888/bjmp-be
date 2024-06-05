@@ -6,40 +6,35 @@
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Headers: *");
     header("Content-Type: application/json");
-
+    require_once 'vendor/autoload.php';
     include './db-connect.php';
     //Get Functions
-    /*
+
     include './get/general-data/get-data.php';
-    */
     include './get/instance/get-ins.php';
     include './get/item/get-item.php';
-    /*
     include './get/lender/get-lender.php';
-    */
     include './get/log/get-log.php';
     /*
     include './get/misc/get-misc.php';
     include './get/misc/get-settings.php';
     */
     include './get/pdl/get-pdl.php';
-    /*
     include './get/transactions/get-tran.php';
-    */
     include './get/users/get-users.php';
     //Post Functions
     include './post/instance/post-ins.php';
     include './post/item/post-item.php';
-    /*
     include './post/lender/post-lender.php';
     include './post/log/post-log.php';
+    /*
     include './post/misc/post-misc.php';
     include './post/misc/post-settings.php';
     */
     include './post/pdl/post-pdl.php';
-    /* 
     include './post/transactions/load/load.php';
     include './post/transactions/pos/pos.php';
+    /* 
     include './post/transactions/generate-receipt.php';
     */
     include './post/users/post-users.php';
@@ -65,10 +60,12 @@
                 getUser($conn, $id, $em);
                 break;
             case "get-pdls":
-                getPdls($conn, 0);
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                getPdls($conn, $br, 0);
                 break;
             case "get-archived-pdls":
-                getPdls($conn, 1);
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                getPdls($conn, $br, 1);
                 break;
             case "get-pdl":
                 $id = isset($_GET['id']) ? $_GET['id'] : '';
@@ -76,10 +73,12 @@
                 getPdl($conn, $id, $br);
                 break;
             case "get-items":
-                getItems($conn, 0);
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                getItems($conn, $br, 0);
                 break;
             case "get-archived-items":
-                getItems($conn, 1);
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                getItems($conn, $br, 1);
                 break;
             case "get-item":
                 $id = isset($_GET['id']) ? $_GET['id'] : '';
@@ -107,21 +106,20 @@
                 */ 
                 break;
             case "get-lenders":
-                //getLenders($conn, 0);
-                break;
-            case "get-archived-lenders":
-                //getLenders($conn, 1);
+                $pid = isset($_GET['pid']) ? $_GET['pid'] : '';
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                getLenders($conn, $pid, $br);
                 break;
             case "get-lender":
-                /*
                 $id = isset($_GET['id']) ? $_GET['id'] : '';
                 $br = isset($_GET['br']) ? $_GET['br'] : '';
-                $pdl = isset($_GET['pdl']) ? $_GET['pdl'] : '';
-                getLender($conn, $id, $br, $pdl);
-                */ 
+                $pid = isset($_GET['pid']) ? $_GET['pid'] : '';
+                getLender($conn, $id, $br, $pid);
                 break;
             case "get-transactions":
-                //getTransactions($conn);
+                $pid = isset($_GET['pid']) ? $_GET['pid'] : '';
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                getTransactions($conn, $br, $pid);
                 break;
             case "get-transaction":
                 /*
@@ -138,11 +136,9 @@
                 getLog($conn, $id);
                 break;
             case "get-commodities":
-                /*
                 $em = isset($_GET['em']) ? $_GET['em'] : '';
                 $br = isset($_GET['br']) ? $_GET['br'] : '';
                 getCommodities($conn, $em, $br);
-                */
                 break;
             case "get-commodity":
                 /*
@@ -159,13 +155,20 @@
                 */
                 break;
             case "get-details":
-                /*
+                
                 $fw = isset($_GET['fw']) ? $_GET['fw'] : '';        //note: fw stands for "from where" meaning from where was it called, the dashboard page, pdl profile, etc.
-                $ty = isset($_GET['ty']) ? $_GET['ty'] : '';
                 $em = isset($_GET['em']) ? $_GET['em'] : '';
                 $br = isset($_GET['br']) ? $_GET['br'] : '';
-                getDashboardInfo($conn, $fw, $ty, $em, $br);
-                */
+                getDashboardInfo($conn, $fw, $em, $br);
+                
+                break;
+            case "get-charts":
+                $ctx = isset($_GET['ctx']) ? $_GET['ctx'] : '';
+                $ty = isset($_GET['ty']) ? $_GET['ty'] : '';
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                $dt = isset($_GET['dt']) ? $_GET['dt'] : '';
+                getChartInfo($conn, $ctx, $ty, $br, $dt);
+                break;
             default:
                 echo "default";
                 break;   
@@ -210,22 +213,19 @@
                 manageInstance($conn, $data, $action);
                 break;
             case "add-commodity":
-            case "edit-commodity":
             case "delete-commodity":
-                //manageCommodity($conn, $data, $action);
+                manageCommodity($conn, $data, $action);
                 break;
             case "add-lender":
             case "edit-lender":
-            case "archive-lender":
-            case "retrieve-lender":
             case "delete-lender":
-                //manageLender($conn, $data, $action);
+                manageLender($conn, $data, $action);
                 break;
             case "purchase-item":
-                //handlePurchase($conn, $data);
+                handlePurchase($conn, $data);
                 break;
-            case "load-user":
-                //handleLoad($conn, $data);
+            case "load-pdl":
+                handleLoad($conn, $data);
                 break;
             case "change-settings":
                 //handleSettings($conn, $data);

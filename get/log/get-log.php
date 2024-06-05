@@ -7,7 +7,7 @@
             $data = array();
             while ($row = $result->fetch_assoc()) {
                 // Check and decode valid JSON strings
-                foreach (['log-item-details', 'log-instance-details', 'log-pdl-details', 'log-user-details'] as $column) {
+                foreach (['log-item-details', 'log-instance-details', 'log-pdl-details', 'log-user-details', 'log-creditor-details'] as $column) {
                     if (isValidJson($row[$column])) {
                         $row[$column] = json_decode($row[$column], true);
                     }
@@ -27,7 +27,7 @@
         if ($result && $result->num_rows > 0) {
             $data = $result->fetch_assoc();
             // Check and decode valid JSON strings
-            foreach (['log-item-details', 'log-instance-details', 'log-pdl-details', 'log-user-details'] as $column) {
+            foreach (['log-item-details', 'log-instance-details', 'log-pdl-details', 'log-user-details', 'log-creditor-details'] as $column) {
                 if (isValidJson($data[$column])) {
                     $data[$column] = json_decode($data[$column], true);
                 }

@@ -82,5 +82,74 @@
             }
         }
     }
+    if(!function_exists('uploadDoc')){
+        function uploadDoc($doc, $userID, $data, $td, $newFilename) {
+        
+            // Generate a unique filename
+            $timestamp = round(microtime(true) * 1000);  // Current timestamp in milliseconds
+            $docFileType = strtolower(pathinfo($doc["name"], PATHINFO_EXTENSION));
+            
+            $targetFile = $td;
+            
+            $uploadOk = 1;
+            
+            // Check if file already exists
+            if (file_exists($targetFile)) {
+                $response = [
+                    'success' => false,
+                    'message' => 'Sorry, file already exists.',
+                    'user' => null
+                ];
+                echo json_encode($response);
+                exit; // Exit the script if file already exists
+            }
+            
+            // Check file size
+            if ($doc["size"] > 5000000) {
+                $response = [
+                    'success' => false,
+                    'message' => 'Sorry, your file is too large.',
+                    'user' => null
+                ];
+                echo json_encode($response);
+                exit; // Exit the script if file is too large
+            }
+            
+            // Allow certain file formats
+            $allowedFormats = ["pdf", "doc", "docx", "txt"];
+            if(!in_array($docFileType, $allowedFormats)) {
+                $response = [
+                    'success' => false,
+                    'message' => 'Sorry, only PDF, DOC, DOCX & TXT files are allowed.',
+                    'user' => null
+                ];
+                echo json_encode($response);
+                exit; // Exit the script if file format is not allowed
+            }
+            
+            // Check if $uploadOk is set to 0 by an error
+            if ($uploadOk == 0) {
+                $response = [
+                    'success' => false,
+                    'message' => 'Sorry, your file was not uploaded.',
+                    'user' => null
+                ];
+                echo json_encode($response);
+                exit; // Exit the script if file was not uploaded
+            } else {
+                if (move_uploaded_file($doc["tmp_name"], $targetFile)) {
+                    return $newFilename;
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Sorry, there was an error uploading your file.',
+                        'user' => null
+                    ];
+                    echo json_encode($response);
+                    exit; // Exit the script if there was an error uploading the file
+                }
+            }
+        }
+    }
 
 ?>

@@ -38,8 +38,8 @@ function manageItem($conn, $data, $type){
 function addItem($conn, $data, $image){
     $currentDateTime = date('Y-m-d H:i:s');
     if($data && $image){
-            $checkIfDupeId = $conn->prepare("SELECT `item-id` FROM items WHERE `item-id` = ? AND `is-archived` = 0");
-            $checkIfDupeId->bind_param("s", $data['item-id']);
+            $checkIfDupeId = $conn->prepare("SELECT `item-id` FROM items WHERE `item-id` = ? AND `is-archived` = 0 AND `item-branch-location` = ?");
+            $checkIfDupeId->bind_param("ss", $data['item-id'], $data['item-branch-location']);
             $checkIfDupeId->execute();
             $dupeIdCheck = $checkIfDupeId->get_result();
             $dupeIdData = $dupeIdCheck->fetch_assoc();
@@ -51,7 +51,8 @@ function addItem($conn, $data, $image){
                     'user' => null
                 ];
             } else {
-                $getLastID = $conn->prepare("SELECT MAX(`item-id`) as last_id FROM items");
+                $getLastID = $conn->prepare("SELECT MAX(`item-id`) as last_id FROM items WHERE `item-branch-location` = ?");
+                $checkIfDupeId->bind_param("s", $data['item-branch-location']);
                 $getLastID->execute();
                 $lastIDResult = $getLastID->get_result();
                 $lastIDData = $lastIDResult->fetch_assoc();
