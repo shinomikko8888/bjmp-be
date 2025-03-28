@@ -185,8 +185,8 @@ use PHPMailer\PHPMailer\SMTP;
                 $mail->isSMTP();
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'bjmpregionthree@gmail.com'; // Replace with your email
-                $mail->Password   = 'neyb ghcb udjl iydk'; // Replace with your password
+                $mail->Username   = ''; // Replace with your email
+                $mail->Password   = ''; // Replace with your password
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
                 $mail->Port       = 465;
                 $mail->setFrom('noreply@example.com', 'BJMPRO-III POS'); // Replace with your email and name
