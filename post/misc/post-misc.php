@@ -1,4 +1,7 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
     if(!function_exists('uploadImage')){
         function uploadImage($image, $userID, $data, $td, $newFilename) {
         
@@ -116,11 +119,11 @@
             }
             
             // Allow certain file formats
-            $allowedFormats = ["pdf", "doc", "docx", "txt"];
+            $allowedFormats = ["pdf", "doc", "docx", "txt", "png", "jpg", "jpeg"];
             if(!in_array($docFileType, $allowedFormats)) {
                 $response = [
                     'success' => false,
-                    'message' => 'Sorry, only PDF, DOC, DOCX & TXT files are allowed.',
+                    'message' => 'Sorry, only PDF, DOC, DOCX, TXT & Image files are allowed.',
                     'user' => null
                 ];
                 echo json_encode($response);
@@ -152,4 +155,51 @@
         }
     }
 
+    if(!function_exists('sendVerificationEmail')){
+        function sendVerificationEmail($data){
+            $year = date('Y');
+            $htmlContent = file_get_contents('./templates/' . $data['type'] .'.html');
+            $emailTitle = '';
+            
+            switch ($data['type']) {
+                case 'user-created':
+                    $htmlContent = str_replace('{{password}}', $data['password'], $htmlContent);
+                    $htmlContent = str_replace('{{name}}', $data['username'], $htmlContent);
+                    $emailTitle .= 'User Creation Notice';
+                    break;
+                case 'user-disabled':
+                    $htmlContent = str_replace('{{reason}}', $data['reason'], $htmlContent);
+                    $emailTitle .= 'Disabling of Account Notice';
+                    break;
+                case 'reset-password':
+                    $htmlContent = str_replace('{{domain}}', 'http://localhost:3000', $htmlContent);
+                    $htmlContent = str_replace('{{token}}', $data['token'], $htmlContent);
+                    $emailTitle .= 'Reset Password Request';
+                    break;
+                default:
+                    break;
+            }
+            $htmlContent = str_replace('{{year}}', $year, $htmlContent);
+            try {
+                $mail = new PHPMailer(true);
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'bjmpregionthree@gmail.com'; // Replace with your email
+                $mail->Password   = 'neyb ghcb udjl iydk'; // Replace with your password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail->Port       = 465;
+                $mail->setFrom('noreply@example.com', 'BJMPRO-III POS'); // Replace with your email and name
+                $mail->addAddress($data['email']);
+                $mail->isHTML(true);                                        // Set email format to HTML
+                $mail->Subject = $emailTitle;
+                $mail->Body    = $htmlContent;
+                $mail->send();
+                return true;
+            } catch (Exception $e) {
+                // Log the error or handle it appropriately
+                return false;
+            }
+        }
+    }
 ?>

@@ -1,1 +1,94 @@
-//This is used if the user changed email
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        @font-face {
+            font-family: 'LCALLIG';
+            src: url('../files/fonts/LCALLIG.TTF');
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-family: 'Tahoma', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        .email-header, .email-footer {
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .email-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../files/images/static/bjmp-logo.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        .email-body {
+            padding: 20px;
+            color: #333333;
+            position: relative;
+            z-index: 2;
+        }
+        h4, h6 {
+            margin: 0;
+        }
+        h6 {
+            margin-top: 5px;
+            font-family: 'LCALLIG', serif;
+        }
+        .spoiler {
+            color: transparent;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            transition: color 0.3s, text-shadow 0.3s;
+            cursor: pointer;
+        }
+        .spoiler:hover {
+            color: #333;
+            text-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h4>Bureau of Jail Management and Penology Region III - Point of Sales</h4>
+            <h6>"Changing Lives, Building a Safer Nation"</h6>
+        </div>
+        <div class="email-body">
+            <p>Hello, {{name}}</p>
+            <p>To confirm this is you, this email will be sent to your account!</p>
+            <p>Your password is: <span class="spoiler">{{password}}</span></p>
+            <br>
+            <p>Best regards,<br><b>BJMPRO-III</b></p>
+        </div>
+        <div class="email-footer">
+            <p>&copy;{{year}} Bureau of Jail Management and Penology Region III. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

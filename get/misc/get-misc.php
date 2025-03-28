@@ -57,6 +57,7 @@
             
             switch ($ctx) {
                 case 'profit':
+                case 'profitModal':
                     for ($month = 1; $month <= 12; $month++) {
                         // Set the current month
                         $currentMonth = DateTime::createFromFormat('Y-m-d', "$year-$month-01");
@@ -127,7 +128,6 @@
                         ];
                     }
                     break;
-                
                 default:
                     # code...
                     break;

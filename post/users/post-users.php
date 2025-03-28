@@ -58,8 +58,18 @@
                     'user' => [
                         'email' => $user['user-email'],
                         'login_token' => $loginToken,
-                        'bjmp_branch'  => $user['user-branch-location']
+                        'bjmp_branch'  => $user['user-branch-location'],
+                        'type' => $user['user-type'],
                     ]
+                ];
+            } else if (!empty($user['user-reset-token'])){
+                $resetLockout = $conn->prepare("UPDATE users SET `user-attempt-count` = 0, `user-last-attempt-time` = NULL WHERE `user-email` = ?");
+                $resetLockout->bind_param("s", $em);
+                $resetLockout->execute();
+                $response = [
+                    'success' => false,
+                    'message' => "This email's password was reset! Check your email for the request link.",
+                    'user' => null
                 ];
             } else {
                 // Update the attempt count and last attempt time
@@ -133,12 +143,19 @@
                 $method = $data['method'];
                 deleteUser($conn, $data, $method);
                 break;
+            case 'change-email':
+                //changeEmail($conn, $data);
+                break;
+            case 'change-password':
+                changePassword($conn, $data);
+                break;
             default:
                 break;
         }
     }
     function addUser($conn, $data, $image){
         $currentDateTime = date('Y-m-d H:i:s');
+        
         if($data && $image){
             // Check if email already exists
             $checkifDupeEmail = $conn->prepare("SELECT `user-email` FROM users WHERE `user-email` = ? AND `is-archived` = 0");
@@ -212,6 +229,13 @@
 
                     if ($insertUser->execute()) {
                         createLog($conn, ['User', 'Create', 'Single'], $logData, $currentDateTime);
+                        $emailData = [
+                            'type' => 'user-created',
+                            'email' => $data['user-email'] ?? '',
+                            'username' => $data['user-first-name'] ?? '',
+                            'password' => $data['user-password'] ?? '',
+                        ];
+                        sendVerificationEmail($emailData);
                         $response = [
                             'success' => true,
                             'message' => 'User added successfully.',
@@ -309,9 +333,17 @@
             $result = $conn->query("SELECT * FROM `users` WHERE `user-id` = $userID");
             if ($result && $result->num_rows > 0) {
                 $conn->query("UPDATE `users` SET `is-archived` = 1, `date-archived` = '$currentDateTime' WHERE `user-id` = $userID");
+                
                 createLog($conn, ['User', 'Archive', 'Single'], $data, $currentDateTime);
                 $updatedResult = $conn->query("SELECT * FROM `users` WHERE `user-id` = $userID");
                 $updatedData = $updatedResult->fetch_assoc();
+                $emailData = [
+                    'type' => 'user-disabled',
+                    'email' => $updatedData['user-email'] ?? '',
+                    'username' => $updatedData['user-first-name'] ?? '',
+                    'reason' => $data['reason'] ?? '',
+                ];
+                sendVerificationEmail($emailData);
                 $response = [
                     'success' => true,
                     'message' => 'User archived successfully.',
@@ -569,4 +601,40 @@
         
         return $hashedPassword;
     }
+
+    //Change Password and Email
+    function changePassword($conn, $data){
+        $response = [];
+        if($data){
+            $hashedPassword = hashPassword($data['password']);
+            $updatePassword = $conn->prepare("UPDATE `users` SET `user-password` = ? WHERE `user-reset-token` = ?");
+            $updatePassword->bind_param("ss", $hashedPassword, $data['reset-token']);
+            $updatePassword->execute();
+            if ($updatePassword->affected_rows === 0) {
+                $response = [
+                    'success' => false
+                ];
+                return;
+            }
+            $removeToken = $conn->prepare("UPDATE `users` SET `user-reset-token` = NULL WHERE `user-reset-token` = ?");
+            $removeToken->bind_param("s", $data['reset-token']);
+            $removeToken->execute();
+            if ($removeToken->affected_rows === 0){
+                $response = [
+                    'success' => false
+                ];
+                return;
+            }
+            $selectEmail = $conn->prepare("SELECT `user-email` FROM `users` WHERE `user-password` = ?");
+            $selectEmail->bind_param("s", $hashedPassword);
+            $selectEmail->execute();
+            $selectEmail->bind_result($userEmail);
+            if ($selectEmail->fetch()) {
+                $response['success'] = true;
+                $response['email'] = $userEmail;
+            }
+        }
+        echo json_encode($response);
+    }
+    
 ?>

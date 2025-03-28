@@ -16,16 +16,20 @@
             $fileName = $timestamp . '_' . sprintf("%011d", $newID) .
             str_replace(' ', '', $data['loading-type']) . '_' .
             str_replace(' ', '', $data['pdl-data']['pdl-branch-location']) . '.pdf';
-            $pdfFilePath = __DIR__ . '\..\..\..\files\docs\receipts\load/' . $fileName;
+            $pdfFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api/files/docs/receipts/load/' . $fileName;
+            if (!file_exists(dirname($pdfFilePath))) {
+                $pdfFilePath = __DIR__ . '/../../../files/docs/receipts/load/' . $fileName;
+            }
             $transactionData= [
-                $id = sprintf("%011d", $newID),
-                $involvedUser = $data['active-email'],
-                $pdlId = $data['pdl-data']['pdl-id'],
-                $oldBalance = $data['pdl-data']['pdl-balance'],
-                $amountLoaded = $data['load-amount'],
-                $pdlCreditor = $data['pdl-creditor'],
-                $typeOfTransaction = $data['loading-type'],
-                $transactionBranchLocation = $data['pdl-data']['pdl-branch-location'],
+                'id' => sprintf("%011d", $newID),
+                'invUser' => $data['active-email'],
+                'pdlId'=> $data['pdl-data']['pdl-id'],
+                'pk' => $data['pdl-data']['pk'],
+                'oldBal' => $data['pdl-data']['pdl-balance'],
+                'amtLoad' => $data['load-amount'],
+                'cred'=> $data['pdl-creditor'],
+                'type' => $data['loading-type'],
+                'branch' => $data['pdl-data']['pdl-branch-location'],
             ];
             $loadAmount = floatval($data['load-amount']);
             $load = $conn->prepare("UPDATE `pdls` SET `pdl-balance` = `pdl-balance` + ? WHERE `pdl-id` = ? AND `pdl-branch-location` = ?");

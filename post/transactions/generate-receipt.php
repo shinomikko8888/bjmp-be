@@ -14,7 +14,11 @@
                     $this->SetFont('lcallig', '', 8);
                     $this->Cell(0, 4, '"Changing Lives, Building a Safer Nation"', 0, 1, 'C');
                     $this->Line(10, $this->GetY() + 2, $this->getPageWidth() - 10, $this->GetY() + 2);
-                    $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    $image_file =  $_SERVER['DOCUMENT_ROOT'] . '/api/files/images/static/bjmp-logo.png';
+                    if (!file_exists(dirname($image_file))) {
+                        // Fallback to alternative path if the original path does not exist
+                        $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    }
                     $this->Image($image_file, 8, 6, 10, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
                     $this->SetMargins(10, 20, 10);
                     $this->Ln(20);
@@ -31,7 +35,11 @@
 
                 public function AddWatermark()
                 {
-                    $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    $image_file =  $_SERVER['DOCUMENT_ROOT'] . '/api/files/images/static/bjmp-logo.png';
+                    if (!file_exists(dirname($image_file))) {
+                        // Fallback to alternative path if the original path does not exist
+                        $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    }
                     $this->SetAlpha(0.1); // Set transparency
                     $this->Image($image_file, ($this->getPageWidth() - 100) / 2, ($this->getPageHeight() - 100) / 2, 100, 100, '', '', '', false, 300, '', false, false, 0);
                     $this->SetAlpha(1); // Reset transparency to default
@@ -64,10 +72,7 @@
             </table>
             <h3 style="width: 100%">Transaction Details</h3>
             <table>
-                <tr class="table-row">
-                    <th style="text-align: left; font-size: 10px;">Conducted by:</th>
-                    <td style="text-align: left; font-size: 10px; font-weight: bold">'. $data['active-email'] .'</td>
-                </tr>
+                
                 <tr class="table-row">
                     <th style="text-align: left; font-size: 10px;">Type of Loading Transaction:</th>
                     <td style="text-align: left; font-size: 10px; font-weight: bold">'. $data['loading-type'] .'</td>
@@ -86,7 +91,7 @@
                     <td style="text-align: left; font-size: 10px; font-weight: bold">PDL#'. $data['pdl-data']['pdl-id'] .'</td>
                 </tr>
                 <tr class="table-row">
-                    <th style="text-align: left; font-size: 10px;">Branch Location:</th>
+                    <th style="text-align: left; font-size: 10px;">Unit Location:</th>
                     <td style="text-align: left; font-size: 10px; font-weight: bold">'. $data['pdl-data']['pdl-branch-location'] .'</td>
                 </tr>
                 <br>
@@ -133,7 +138,11 @@
                     $this->SetFont('lcallig', '', 8);
                     $this->Cell(0, 4, '"Changing Lives, Building a Safer Nation"', 0, 1, 'C');
                     $this->Line(10, $this->GetY() + 2, $this->getPageWidth() - 10, $this->GetY() + 2);
-                    $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    $image_file =  $_SERVER['DOCUMENT_ROOT'] . '/api/files/images/static/bjmp-logo.png';
+                    if (!file_exists(dirname($image_file))) {
+                        // Fallback to alternative path if the original path does not exist
+                        $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    }
                     $this->Image($image_file, 8, 6, 10, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
                     $this->SetMargins(10, 20, 10);
                     $this->Ln(20);
@@ -150,7 +159,11 @@
 
                 public function AddWatermark()
                 {
-                    $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    $image_file =  $_SERVER['DOCUMENT_ROOT'] . '/api/files/images/static/bjmp-logo.png';
+                    if (!file_exists(dirname($image_file))) {
+                        // Fallback to alternative path if the original path does not exist
+                        $image_file = __DIR__ . '\..\..\files\images\static\bjmp-logo.png';
+                    }
                     $this->SetAlpha(0.1); // Set transparency
                     $this->Image($image_file, ($this->getPageWidth() - 100) / 2, ($this->getPageHeight() - 100) / 2, 100, 100, '', '', '', false, 300, '', false, false, 0);
                     $this->SetAlpha(1); // Reset transparency to default
@@ -225,10 +238,7 @@
                 <tr>
                 <td></td>
                 </tr>
-                <tr class="table-row">
-                    <th style="text-align: left; font-size: 10px;" colspan="2">Conducted by:</th>
-                    <td style="text-align: left; font-size: 10px; font-weight: bold" colspan="2">'. $data['active-email'] .'</td>
-                </tr>
+                
                 <tr class="table-row">
                     <th style="text-align: left; font-size: 10px;" colspan="2">Type of Purchase:</th>
                     <td style="text-align: left; font-size: 10px; font-weight: bold" colspan="2">'. $data['purchase-type'] .'</td>
@@ -242,7 +252,7 @@
                     <td style="text-align: left; font-size: 10px; font-weight: bold" colspan="2">PDL#'. $data['pdl-data']['pdl-id'] .'</td>
                 </tr>
                 <tr class="table-row">
-                    <th style="text-align: left; font-size: 10px;" colspan="2">Branch Location:</th>
+                    <th style="text-align: left; font-size: 10px;" colspan="2">Unit Location:</th>
                     <td style="text-align: left; font-size: 10px; font-weight: bold" colspan="2">'. $data['pdl-data']['pdl-branch-location'] .'</td>
                 </tr>
                 <tr>

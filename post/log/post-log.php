@@ -47,15 +47,18 @@
                         `transaction-branch-location`,
                         `transaction-amount`,
                         `transaction-pdl`,
+                        `transaction-pdl-pk`,
                         `transaction-lender`,
                         `transaction-receipt`
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
-                    $insertTransaction->bind_param("issssdiss", $data[0], $date, $data[1], $action, $data[7], $data[4], $data[2], $data[5], $filepath);
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" );
+                    $insertTransaction->bind_param("issssdiiss", $data['id'], $date, 
+                    $data['invUser'], $action, $data['branch'], $data['amtLoad'], 
+                    $data['pdlId'], $data['pk'], $data['cred'], $filepath);
                     $insertTransaction->execute();
                 }
                 else if ($action === 'Purchase'){
                     $items = [];
-                    foreach ($data[6] as $item) {
+                    foreach ($data['bought'] as $item) {
                         $items[] = [
                             'id' => $item['commodity-item-id'], 
                             'type' => $item['commodity-type'], 
@@ -73,10 +76,12 @@
                         `transaction-branch-location`,
                         `transaction-amount`,
                         `transaction-pdl`,
+                        `transaction-pdl-pk`,
                         `transaction-items`,
                         `transaction-receipt`
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $insertTransaction->bind_param("issssdiss", $data[0], $date, $data[1], $action, $data[5], $data[7], $data[2], $itemsJson, $filepath);
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $insertTransaction->bind_param("issssdiiss", $data['id'], $date, $data['invUser'], $action, 
+                    $data['branch'], $data['price'], $data['pdlId'], $data['pk'],$itemsJson, $filepath);
                     $insertTransaction->execute();
 
                 }

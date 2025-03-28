@@ -12,13 +12,12 @@
                 break;
         }
     }
-
+    
     function addInstance($conn, $data){
         $currentDateTime = date('Y-m-d H:i:s');
         if($data){
-            $checkIfDupeId = $conn->prepare("SELECT `instance-id` FROM instances WHERE `instance-id` = ? AND `instance-type` = ? AND
-            `instance-name` = ? AND `instance-branch-location` = ?");
-            $checkIfDupeId->bind_param("ssss", $data['instance-id'], $data['instance-type'], $data['instance-name'], $data['instance-branch-location']);
+            $checkIfDupeId = $conn->prepare("SELECT `instance-id` FROM instances WHERE `instance-id` = ? AND `instance-branch-location` = ?");
+            $checkIfDupeId->bind_param("ss", $data['instance-id'], $data['instance-branch-location']);
             $checkIfDupeId->execute();
             $dupeIdCheck = $checkIfDupeId->get_result();
             $dupeIdData = $dupeIdCheck->fetch_assoc();
@@ -30,27 +29,30 @@
                 ];
             }
             else {
-                $getLastID = $conn->prepare("SELECT MAX(`instance-id`) as last_id FROM instances WHERE `instance-type` = ? AND
-                `instance-name` = ? AND `instance-branch-location` = ?");
-                $getLastID->bind_param("sss", $data['instance-type'], $data['instance-name'], $data['instance-branch-location']);
+                $getLastID = $conn->prepare("SELECT MAX(`instance-id`) as last_id FROM instances WHERE `instance-item-pk` = ? AND `instance-branch-location` = ?");
+                $getLastID->bind_param("ss", $data['instance-item-pk'], $data['instance-branch-location']);
                 $getLastID->execute();
                 $lastIDResult = $getLastID->get_result();
                 $lastIDData = $lastIDResult->fetch_assoc();
                 $newID = $lastIDData['last_id'] + 1;
-    
-               
+                $exp = $data['instance-expiration-date']; // Get the expiration date
+
+                // Check if the expiration date is set and if it equals 'N/A'
+                if (isset($exp) && $exp === 'N/A') {
+                    $exp = null; // Set expiration date to null if it is 'N/A'
+                }
+                            
                 $insert = $conn->prepare("INSERT INTO instances (
                         `instance-id`, 
-                        `instance-type`,
-                        `instance-name`,
+                        `instance-item-pk`,
                         `instance-remaining-stock`,
                         `instance-branch-location`,
                         `instance-created-at`,
                         `instance-expiration-date`,
-                        `is-archived`) VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
+                        `is-archived`) VALUES (?, ?, ?, ?, ?, ?, 0)");
         
-                $insert->bind_param("ississs", $newID, $data['instance-type'], $data['instance-name'], $data['instance-remaining-stock'], $data['instance-branch-location'],
-                    $data['instance-date-time'], $data['instance-expiration-date']);
+                $insert->bind_param("isisss", $newID, $data['instance-item-pk'], $data['instance-remaining-stock'], $data['instance-branch-location'],
+                    $data['instance-date-time'], $exp);
                             $logData = [
                                 'id' => $newID,
                                 'user' => $data['active-email'],

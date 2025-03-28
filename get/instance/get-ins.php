@@ -1,13 +1,11 @@
 <?php
-    function getInstances($conn, $it, $in, $br, $archived){
-        if($it && $in && $br){
+    function getInstances($conn, $pk, $br, $archived){
+        if($pk && $br){
             if($br = 'BJMPRO-III Main Office'){
-             $result = $conn->query("SELECT * FROM `instances` WHERE `instance-type` = '$it' AND 
-                `instance-name` = '$in' AND `is-archived` = $archived");
+             $result = $conn->query("SELECT * FROM `instances` WHERE `instance-item-pk` = '$pk' AND `is-archived` = $archived");
             }
             else{
-            $result = $conn->query("SELECT * FROM `instances` WHERE `instance-type` = '$it' AND 
-                `instance-name` = '$in' AND `instance-branch-location` = '$br' AND `is-archived` = $archived");
+             $result = $conn->query("SELECT * FROM `instances` WHERE  `instance-item-pk` = '$pk' AND `instance-branch-location` = '$br' AND `is-archived` = $archived");
             }
             if ($result && $result->num_rows > 0) {
                 $data = array();

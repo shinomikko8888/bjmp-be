@@ -3,19 +3,19 @@
         if ($br){
             $result = $conn->query("SELECT items.*, COALESCE(SUM(instances.`instance-remaining-stock`), 0) AS `item-remaining-stock`
             FROM `items`
-            LEFT JOIN `instances` ON items.`item-type` = instances.`instance-type`
-                                AND items.`item-name` = instances.`instance-name`
+            LEFT JOIN `instances` ON items.`pk` = instances.`instance-item-pk`
                                 AND items.`item-branch-location` = instances.`instance-branch-location`
             WHERE items.`is-archived` = $archived AND items.`item-branch-location` = '$br'
-            GROUP BY items.`item-id`");
+            GROUP BY items.`pk`
+            ORDER BY items.`item-id` ASC");
         } else {
             $result = $conn->query("SELECT items.*, COALESCE(SUM(instances.`instance-remaining-stock`), 0) AS `item-remaining-stock`
             FROM `items`
-            LEFT JOIN `instances` ON items.`item-type` = instances.`instance-type`
-                                AND items.`item-name` = instances.`instance-name`
+            LEFT JOIN `instances` ON items.`pk` = instances.`instance-item-pk`
                                 AND items.`item-branch-location` = instances.`instance-branch-location`
             WHERE items.`is-archived` = $archived
-            GROUP BY items.`item-id`");
+            GROUP BY items.`pk`
+            ORDER BY items.`item-id` ASC");
         }
         
         if ($result && $result->num_rows > 0) {
@@ -30,23 +30,20 @@
         }
     }
     function getItem($conn, $id, $br){
-        if($id){
+        if ($br){
             $result = $conn->query("SELECT items.*, COALESCE(SUM(instances.`instance-remaining-stock`), 0) AS `item-remaining-stock`
                                     FROM `items`
-                                    LEFT JOIN `instances` ON items.`item-type` = instances.`instance-type`
-                                                        AND items.`item-name` = instances.`instance-name`
+                                    LEFT JOIN `instances` ON items.`pk` = instances.`instance-item-pk`
                                                         AND items.`item-branch-location` = instances.`instance-branch-location`
-                                    WHERE items. `item-id` = $id
-                                    GROUP BY items.`item-id`");
-        }
-        else if ($br){
+                                    WHERE items. `pk` = $id AND items. `item-branch-location` = '$br'
+                                    GROUP BY items.`pk`");
+        } else {
             $result = $conn->query("SELECT items.*, COALESCE(SUM(instances.`instance-remaining-stock`), 0) AS `item-remaining-stock`
                                     FROM `items`
-                                    LEFT JOIN `instances` ON items.`item-type` = instances.`instance-type`
-                                                        AND items.`item-name` = instances.`instance-name`
+                                    LEFT JOIN `instances` ON items.`pk` = instances.`instance-item-pk`
                                                         AND items.`item-branch-location` = instances.`instance-branch-location`
-                                    WHERE items. `item-id` = $id AND items. `item-branch-location` = $br
-                                    GROUP BY items.`item-id`");
+                                    WHERE items. `pk` = $id
+                                    GROUP BY items.`pk`");
         }
         if ($result && $result->num_rows > 0) {
             $data = $result->fetch_assoc();

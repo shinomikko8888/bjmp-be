@@ -1,7 +1,7 @@
 <?php
     function getTransactions($conn, $br, $pid){
         if($pid && $br){
-            $result = $conn->query("SELECT * FROM `transactions` WHERE `transaction-pdl` = '$pid' AND `transaction-branch-location` = '$br' ORDER BY `transaction-id` DESC");
+            $result = $conn->query("SELECT * FROM `transactions` WHERE `transaction-pdl-pk` = '$pid' AND `transaction-branch-location` = '$br' ORDER BY `transaction-id` DESC");
         }
         else if($br){
             $result = $conn->query("SELECT * FROM `transactions` WHERE `transaction-branch-location` = '$br' ORDER BY `transaction-id` DESC");

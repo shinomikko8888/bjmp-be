@@ -17,8 +17,8 @@
     include './get/log/get-log.php';
     /*
     include './get/misc/get-misc.php';
-    include './get/misc/get-settings.php';
     */
+    include './get/misc/get-settings.php';
     include './get/pdl/get-pdl.php';
     include './get/transactions/get-tran.php';
     include './get/users/get-users.php';
@@ -29,8 +29,9 @@
     include './post/log/post-log.php';
     /*
     include './post/misc/post-misc.php';
-    include './post/misc/post-settings.php';
     */
+    include './post/misc/post-settings.php';
+    include './post/misc/post-report.php';
     include './post/pdl/post-pdl.php';
     include './post/transactions/load/load.php';
     include './post/transactions/pos/pos.php';
@@ -86,16 +87,14 @@
                 getItem($conn, $id, $br);
                 break;
             case "get-instances":
-                $it = isset($_GET['it']) ? $_GET['it'] : '';
-                $in = isset($_GET['in']) ? $_GET['in'] : '';
+                $pk = isset($_GET['pk']) ? $_GET['pk'] : '';
                 $br = isset($_GET['br']) ? $_GET['br'] : '';   
-                getInstances($conn, $it, $in, $br, 0);
+                getInstances($conn, $pk, $br, 0);
                 break;
              case "get-archived-instances":
-                $it = isset($_GET['it']) ? $_GET['it'] : '';
-                $in = isset($_GET['in']) ? $_GET['in'] : '';
+                $pk = isset($_GET['pk']) ? $_GET['pk'] : '';
                 $br = isset($_GET['br']) ? $_GET['br'] : '';   
-                getInstances($conn, $it, $in, $br, 1);
+                getInstances($conn, $pk, $br, 1);
                 break;
             case "get-instance":
                 /*
@@ -149,17 +148,16 @@
                 */ 
                 break;
             case "get-settings":
-                /*
-                $id = isset($_GET['id']) ? $_GET['id'] : '';
-                getSettings($conn, $id);
-                */
+                $br = isset($_GET['br']) ? $_GET['br'] : '';
+                getSettings($conn, $br);
                 break;
             case "get-details":
                 
                 $fw = isset($_GET['fw']) ? $_GET['fw'] : '';        //note: fw stands for "from where" meaning from where was it called, the dashboard page, pdl profile, etc.
                 $em = isset($_GET['em']) ? $_GET['em'] : '';
                 $br = isset($_GET['br']) ? $_GET['br'] : '';
-                getDashboardInfo($conn, $fw, $em, $br);
+                $id = isset($_GET['id']) ? $_GET['id'] : '';
+                getDashboardInfo($conn, $fw, $em, $br, $id);
                 
                 break;
             case "get-charts":
@@ -167,7 +165,8 @@
                 $ty = isset($_GET['ty']) ? $_GET['ty'] : '';
                 $br = isset($_GET['br']) ? $_GET['br'] : '';
                 $dt = isset($_GET['dt']) ? $_GET['dt'] : '';
-                getChartInfo($conn, $ctx, $ty, $br, $dt);
+                $id = isset($_GET['id']) ? $_GET['id'] : '';
+                getChartInfo($conn, $ctx, $ty, $br, $dt, $id);
                 break;
             default:
                 echo "default";
@@ -189,6 +188,8 @@
             case "archive-user":
             case "retrieve-user":
             case "delete-user":
+            case "change-email":
+            case "change-password":      
                 manageUser($conn, $data, $action);
                 break;
             case "add-pdl":
@@ -196,6 +197,8 @@
             case "archive-pdl":
             case "retrieve-pdl":
             case "delete-pdl":
+            case "set-fingerprint":
+            case "remove-fingerprint":
                 managePdl($conn, $data, $action);
                 break;
             case "add-item":
@@ -228,7 +231,11 @@
                 handleLoad($conn, $data);
                 break;
             case "change-settings":
-                //handleSettings($conn, $data);
+                handleSettings($conn, $data);
+                break;
+            case "generate-report":
+                handleReport($conn, $data);
+                break;
             default:
                 echo 'default';
                 break;
